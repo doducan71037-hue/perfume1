@@ -78,6 +78,7 @@ export async function GET(request: NextRequest) {
     });
 
     // 只返回前20条，并移除 searchName 和 popularityScore（不需要返回给前端）
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const textResults = sorted.slice(0, 20).map(({ searchName, popularityScore, ...rest }) => rest);
 
     return NextResponse.json({

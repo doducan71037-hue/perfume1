@@ -42,6 +42,7 @@ export function UsersTable() {
 
   useEffect(() => {
     fetchUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, search]);
 
   const handleUpdateUser = async (userId: string, field: "role" | "status", value: string) => {

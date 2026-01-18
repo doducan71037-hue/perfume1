@@ -81,7 +81,7 @@ export default function Home() {
       <section className="py-32 bg-black text-white border-t border-gray-900">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <p className="text-2xl md:text-4xl font-light leading-tight mb-10">
-            "Scent is the most intense form of memory."
+            &quot;Scent is the most intense form of memory.&quot;
           </p>
           <p className="text-[10px] uppercase tracking-widest text-gray-500">
             Jean-Paul Guerlain

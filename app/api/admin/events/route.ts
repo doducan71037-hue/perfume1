@@ -5,7 +5,7 @@ import { handleError } from "@/lib/errors/handler";
 
 export async function GET(request: NextRequest) {
   try {
-    const { user, error } = await requireAdmin();
+    const { error } = await requireAdmin();
     if (error) {
       return error;
     }
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get("userId");
     const sessionId = searchParams.get("sessionId");
 
-    const where: any = {};
+    const where: Record<string, unknown> = {};
     if (type) {
       where.type = type;
     }

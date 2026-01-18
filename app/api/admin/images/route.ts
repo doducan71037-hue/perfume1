@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         createdAt: c.createdAt.toISOString(),
       })),
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching image candidates:", error);
     return NextResponse.json(
       { error: "Internal server error" },

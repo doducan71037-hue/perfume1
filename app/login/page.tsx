@@ -24,8 +24,8 @@ export default function LoginPage() {
     try {
       await login(email, password);
       router.push('/');
-    } catch (error: any) {
-      setError(error.message || '登录失败，请重试');
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : '登录失败，请重试');
     }
   };
 

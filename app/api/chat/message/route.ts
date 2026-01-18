@@ -8,7 +8,7 @@ import {
   isQuestionnaireComplete,
   UserProfile,
 } from "@/lib/chat/questionnaire";
-import { retrieveCandidates } from "@/lib/recommendation/rag";
+import { retrieveCandidates, RecommendationResult } from "@/lib/recommendation/rag";
 import { rankRecommendations } from "@/lib/recommendation/scoring";
 import { generateReport, generateQuickTextSummary, generateQuickReport } from "@/lib/recommendation/report";
 
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. 更新消息列表
-    const messages = conversation.messages as any[];
+    const messages = conversation.messages as Array<{ role: string; content: string }>;
     messages.push({
       role: "user",
       content: answer,
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
       const recommendation = await prisma.recommendation.create({
         data: {
           conversationId,
-          rationaleJSON: quickReport,
+          rationaleJSON: JSON.parse(JSON.stringify(quickReport)),
         },
       });
 
@@ -136,8 +136,7 @@ export async function POST(request: NextRequest) {
     } else {
       // 6. 生成下一问（使用GPT-3.5，优化prompt以加快响应）
       // 优化：使用更简洁的prompt，减少等待时间
-      const lastUserMessage = messages.filter((m: any) => m.role === "user").pop()?.content || "";
-      const lastAssistantMessage = messages.filter((m: any) => m.role === "assistant").pop()?.content || "";
+      const lastUserMessage = messages.filter((m) => m.role === "user").pop()?.content || "";
       
       const nextQuestion = await chatGPT35([
         {
@@ -180,7 +179,7 @@ export async function POST(request: NextRequest) {
  */
 async function generateDetailedReportAsync(
   profile: UserProfile,
-  topCandidates: any[],
+  topCandidates: RecommendationResult[],
   recommendationId: string,
   quickSummary: string
 ) {

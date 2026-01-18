@@ -3,7 +3,7 @@ import { requireAdmin } from "@/lib/auth/require-admin";
 import { UsersTable } from "./users-table";
 
 export default async function UsersPage() {
-  const { user, error } = await requireAdmin();
+  const { error } = await requireAdmin();
   if (error) {
     redirect("/login");
   }

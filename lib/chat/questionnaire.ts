@@ -87,7 +87,7 @@ export const QUESTIONNAIRE_QUESTIONS: Question[] = [
  * 从对话历史中提取用户画像
  * @param messages 可以是消息数组或已连接的字符串
  */
-export function extractProfileFromMessages(messages: any[] | string): UserProfile {
+export function extractProfileFromMessages(messages: Array<{ role?: string; content?: string }> | string): UserProfile {
   const profile: UserProfile = {};
 
   // 简化实现：从最后几条消息中提取关键词
@@ -95,7 +95,7 @@ export function extractProfileFromMessages(messages: any[] | string): UserProfil
   const lastMessages = typeof messages === "string" 
     ? messages 
     : Array.isArray(messages) 
-      ? messages.slice(-5).map((m: any) => typeof m === "string" ? m : m.content || "").join(" ")
+      ? messages.slice(-5).map((m) => typeof m === "string" ? m : m.content || "").join(" ")
       : "";
 
   // 场景识别
@@ -131,7 +131,7 @@ export function extractProfileFromMessages(messages: any[] | string): UserProfil
  * 判断是否完成问诊（简单实现：至少3轮对话）
  */
 export function isQuestionnaireComplete(
-  messages: any[],
+  messages: Array<{ role?: string; content?: string }>,
   profile: UserProfile
 ): boolean {
   const hasEnoughInfo =

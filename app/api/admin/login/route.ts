@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
       { error: "邮箱或密码错误" },
       { status: 401 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Admin login error:", error);
     return NextResponse.json(
       { error: "登录失败，请重试" },

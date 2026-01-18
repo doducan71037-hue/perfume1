@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 interface Event {
   id: string;
   type: string;
-  payload: any;
+  payload: Record<string, unknown>;
   sessionId: string | null;
   userId: string | null;
   createdAt: string;

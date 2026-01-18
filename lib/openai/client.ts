@@ -18,7 +18,7 @@ function buildGeminiPayload(messages: ChatMessage[], temperature: number, maxTok
 
   // 关键发现：代理 API 在收到 generationConfig 时会自动添加无效的 thinking_budget
   // 解决方案：对于代理 API，完全不发送 generationConfig，让 API 使用默认值
-  const payload: any = {
+  const payload: Record<string, unknown> = {
     contents,
   };
 

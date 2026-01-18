@@ -30,6 +30,7 @@ export default function ImageReviewPage() {
   useEffect(() => {
     // 检查是否已认证（通过cookie session）
     checkAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkAuth = async () => {
@@ -42,7 +43,7 @@ export default function ImageReviewPage() {
         setAuthenticated(false);
         setLoading(false);
       }
-    } catch (error) {
+    } catch {
       setAuthenticated(false);
       setLoading(false);
     }
@@ -71,7 +72,7 @@ export default function ImageReviewPage() {
       } else {
         alert(data.error || "登录失败");
       }
-    } catch (error) {
+    } catch {
       alert("登录失败，请重试");
     }
   };

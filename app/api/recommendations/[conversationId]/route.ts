@@ -36,7 +36,7 @@ export async function GET(
     }
 
     // 返回报告数据
-    const report = recommendation.rationaleJSON as any;
+    const report = recommendation.rationaleJSON as Record<string, unknown>;
     
     // 构建 perfumeId -> imageUrl 映射，用于前端显示
     const perfumeImageMap = recommendation.perfumes.reduce(
@@ -49,13 +49,13 @@ export async function GET(
 
     // 将 imageUrl 直接添加到 report 的每个香水对象中，确保图片与产品一致
     if (report.topRecommendations && Array.isArray(report.topRecommendations)) {
-      report.topRecommendations = report.topRecommendations.map((perfume: any) => ({
+      report.topRecommendations = (report.topRecommendations as Array<Record<string, unknown>>).map((perfume) => ({
         ...perfume,
         imageUrl: perfumeImageMap[perfume.perfumeId] || null,
       }));
     }
     if (report.alternatives && Array.isArray(report.alternatives)) {
-      report.alternatives = report.alternatives.map((perfume: any) => ({
+      report.alternatives = (report.alternatives as Array<Record<string, unknown>>).map((perfume) => ({
         ...perfume,
         imageUrl: perfumeImageMap[perfume.perfumeId] || null,
       }));

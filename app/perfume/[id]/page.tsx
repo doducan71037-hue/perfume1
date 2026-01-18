@@ -95,7 +95,7 @@ export default function PerfumeDetailPage({
         if (data.feedbackSummary) {
           setFeedbackSummary(data.feedbackSummary);
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Error fetching perfume:", error);
         if (error.name === 'AbortError') {
           console.error("Request timeout after 2.5 seconds");

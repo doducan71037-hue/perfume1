@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getSessionToken, deleteAuthSession } from "@/lib/auth/session";
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     const token = await getSessionToken();
     if (token) {
@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "登出失败" },
       { status: 500 }

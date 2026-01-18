@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { prisma } from "@/lib/db";
 import { handleError } from "@/lib/errors/handler";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const { user, error } = await requireAdmin();
+    const { error } = await requireAdmin();
     if (error) {
       return error;
     }

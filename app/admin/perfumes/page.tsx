@@ -50,6 +50,7 @@ export default function AdminPerfumesPage() {
   useEffect(() => {
     // 检查是否已认证（通过cookie session）
     checkAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkAuth = async () => {
@@ -62,7 +63,7 @@ export default function AdminPerfumesPage() {
       } else {
         setAuthenticated(false);
       }
-    } catch (error) {
+    } catch {
       setAuthenticated(false);
     }
   };
@@ -75,6 +76,7 @@ export default function AdminPerfumesPage() {
       }, 500);
       return () => clearTimeout(timer);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, pagination.page, authenticated]);
 
   const handleLogin = async () => {
@@ -100,7 +102,7 @@ export default function AdminPerfumesPage() {
       } else {
         alert(data.error || "登录失败");
       }
-    } catch (error) {
+    } catch {
       alert("登录失败，请重试");
     }
   };
@@ -132,9 +134,9 @@ export default function AdminPerfumesPage() {
       const data = await response.json();
       setPerfumes(data.perfumes || []);
       setPagination(data.pagination || pagination);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching perfumes:", error);
-      alert(`加载香水列表失败: ${error.message || "未知错误"}`);
+      alert(`加载香水列表失败: ${error instanceof Error ? error.message : "未知错误"}`);
     } finally {
       setLoading(false);
     }
@@ -186,9 +188,9 @@ export default function AdminPerfumesPage() {
 
       alert(`已${perfume.isHidden ? "显示" : "隐藏"}该香水`);
       fetchPerfumes();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error toggling hide status:", error);
-      alert(error.message || "操作失败，请重试");
+      alert(error instanceof Error ? error.message : "操作失败，请重试");
     } finally {
       setTogglingHide(null);
     }
@@ -216,9 +218,9 @@ export default function AdminPerfumesPage() {
       setEditingPerfume(null);
       setEditForm({});
       fetchPerfumes();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error saving perfume:", error);
-      alert(error.message || "保存失败，请重试");
+      alert(error instanceof Error ? error.message : "保存失败，请重试");
     } finally {
       setSaving(false);
     }

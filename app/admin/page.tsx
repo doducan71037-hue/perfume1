@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { StatsCards } from "./stats-cards";
 
 export default async function AdminPage() {
-  const { user, error } = await requireAdmin();
+  const { error } = await requireAdmin();
   if (error) {
     redirect("/login");
   }

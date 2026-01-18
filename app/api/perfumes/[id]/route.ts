@@ -94,8 +94,8 @@ export async function GET(
           }),
         ]);
 
-        return await Promise.race([dataPromise, timeoutPromise]) as [any[], any[], any[], any[]];
-      } catch (error) {
+        return await Promise.race([dataPromise, timeoutPromise]) as [unknown[], unknown[], unknown[], unknown[]];
+      } catch {
         // 超时或错误时返回空数组，不阻塞主响应
         return [[], [], [], []];
       }
@@ -166,8 +166,8 @@ export async function GET(
           }),
         ]);
 
-        return await Promise.race([dataPromise, timeoutPromise]) as [any[], any];
-      } catch (error) {
+        return await Promise.race([dataPromise, timeoutPromise]) as [unknown[], Record<string, unknown>];
+      } catch {
         // 超时或错误时返回空数据，不阻塞主响应
         return [[], { likeCount: 0, dislikeCount: 0, totalCount: 0, reasonCounts: {} }];
       }

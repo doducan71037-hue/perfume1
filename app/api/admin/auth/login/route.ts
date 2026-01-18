@@ -69,10 +69,10 @@ export async function POST(request: NextRequest) {
         role: user.role,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "请求数据格式错误", details: error.errors },
+        { error: "请求数据格式错误", details: error.issues },
         { status: 400 }
       );
     }

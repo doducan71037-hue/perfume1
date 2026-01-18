@@ -50,7 +50,7 @@ export async function verifyAdmin(request: NextRequest): Promise<{
       authorized: false,
       error: "Unauthorized",
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Admin auth error:", error);
     return {
       authorized: false,

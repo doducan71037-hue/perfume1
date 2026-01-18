@@ -25,7 +25,7 @@ export async function retrieveCandidates(
   limit: number = 20
 ): Promise<RecommendationResult[]> {
   // 1. 结构化过滤（预算、季节、性别等）
-  const where: any = {};
+  const where: Record<string, unknown> = {};
 
   if (userProfile.budget) {
     where.priceRange = userProfile.budget;
@@ -96,7 +96,7 @@ export async function retrieveCandidates(
   // 2. 向量相似度搜索（如果有用户描述）
   if (userProfile.naturalLanguage) {
     try {
-      const userEmbedding = await generateEmbedding(userProfile.naturalLanguage);
+      await generateEmbedding(userProfile.naturalLanguage);
 
       // 计算相似度（简化实现：在应用层计算）
       // 注意：实际应该在数据库层面使用pgvector，但Prisma不支持

@@ -65,7 +65,7 @@ export async function GET(
     }
 
     return NextResponse.json({ perfume });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching perfume:", error);
     return NextResponse.json(
       { error: "Internal server error" },
@@ -133,10 +133,10 @@ export async function PUT(
       success: true,
       perfume: updated,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid request data", details: error.errors },
+        { error: "Invalid request data", details: error.issues },
         { status: 400 }
       );
     }

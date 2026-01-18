@@ -1,15 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { handleError, AppError } from "@/lib/errors/handler";
+import { handleError } from "@/lib/errors/handler";
 import { getOrCreateSession } from "@/lib/session";
 import { checkRateLimit } from "@/lib/rate-limit";
 
-const startSchema = z.object({
-  // 可选：预填信息
-});
-
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     // 1. 获取或创建session（基于cookie）
     const sessionId = await getOrCreateSession();

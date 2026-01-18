@@ -5,7 +5,7 @@ import { handleError } from "@/lib/errors/handler";
 
 export async function GET(request: NextRequest) {
   try {
-    const { user, error } = await requireAdmin();
+    const { error } = await requireAdmin();
     if (error) {
       return error;
     }
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") || "";
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Record<string, unknown> = {};
     if (search) {
       where.OR = [
         { email: { contains: search, mode: "insensitive" } },
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const { user, error } = await requireAdmin();
+    const { error } = await requireAdmin();
     if (error) {
       return error;
     }
@@ -70,7 +70,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "缺少用户ID" }, { status: 400 });
     }
 
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     if (role !== undefined) {
       if (!["USER", "ADMIN"].includes(role)) {
         return NextResponse.json({ error: "无效的角色" }, { status: 400 });
