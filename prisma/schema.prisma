@@ -1,0 +1,375 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// 香水主表
+model Perfume {
+  id                    String   @id @default(cuid())
+  brand                 String
+  name                  String
+  year                  Int?
+  concentration         String? // "EDT" | "EDP" | "Parfum" | "Extrait"
+  gender                String? // "unisex" | "male" | "female"
+  priceRange            String   @default("mid") // "budget" | "mid" | "luxury"
+  description           String?  @db.Text
+  profileText           String   @db.Text // 用于向量化的完整描述
+  imageUrl              String?  @db.Text
+  imageSource           String   @default("NONE") // "WIKIMEDIA" | "OPENVERSE" | "USER" | "NONE"
+  imageAttribution      String?  @db.Text
+  source                String   @default("SEED") // HF | WIKIDATA | SEED
+  sourceId              String   @default(cuid())
+  searchName            String   @default("")
+  popularityScore       Float    @default(0.5)
+  isHidden              Boolean  @default(false) // 是否在前端隐藏
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  notes                 PerfumeNote[]
+  accords               PerfumeAccord[]
+  tags                  PerfumeTag[]
+  affiliateLinks        AffiliateLink[]
+  recommendations       RecommendationPerfume[]
+  feedbacks             Feedback[]
+  similarPerfumes       SimilarPerfume[] @relation("PerfumeSimilar")
+  similarTo             SimilarPerfume[] @relation("SimilarPerfume")
+  imageCandidates       PerfumeImageCandidate[]
+
+  @@unique([source, sourceId])
+  @@index([searchName])
+  @@index([brand, name])
+  @@index([priceRange])
+  @@index([popularityScore])
+  @@map("perfumes")
+}
+
+// 香调/香料表
+model Note {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  nameCn      String?  // 中文名
+  category    String   // "citrus" | "floral" | "woody" | "oriental" | "fresh" | "spicy" | "gourmand" | "aquatic"
+  description String?  @db.Text
+  synonyms    String[] // 同义词数组
+  createdAt   DateTime @default(now())
+
+  // Relations
+  perfumes    PerfumeNote[]
+
+  @@index([category])
+  @@map("notes")
+}
+
+// 香调组合表
+model Accord {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  nameCn      String?  // 中文名
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  // Relations
+  perfumes    PerfumeAccord[]
+
+  @@map("accords")
+}
+
+// 标签表
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  nameCn    String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  perfumes  PerfumeTag[]
+
+  @@map("tags")
+}
+
+// 香水-香调关联表（多对多，包含前中后调信息）
+model PerfumeNote {
+  id         String   @id @default(cuid())
+  perfumeId  String
+  noteId     String
+  position   String   // "top" | "middle" | "base"
+  weight     Float    @default(1.0) // 权重 0-1
+  createdAt  DateTime @default(now())
+
+  // Relations
+  perfume    Perfume  @relation(fields: [perfumeId], references: [id], onDelete: Cascade)
+  note       Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+
+  @@unique([perfumeId, noteId, position])
+  @@index([perfumeId])
+  @@index([noteId])
+  @@map("perfume_notes")
+}
+
+// 香水-香调组合关联表
+model PerfumeAccord {
+  id        String   @id @default(cuid())
+  perfumeId String
+  accordId  String
+  createdAt DateTime @default(now())
+
+  // Relations
+  perfume   Perfume  @relation(fields: [perfumeId], references: [id], onDelete: Cascade)
+  accord    Accord   @relation(fields: [accordId], references: [id], onDelete: Cascade)
+
+  @@unique([perfumeId, accordId])
+  @@index([perfumeId])
+  @@index([accordId])
+  @@map("perfume_accords")
+}
+
+// 香水-标签关联表
+model PerfumeTag {
+  id        String   @id @default(cuid())
+  perfumeId String
+  tagId     String
+  createdAt DateTime @default(now())
+
+  // Relations
+  perfume   Perfume  @relation(fields: [perfumeId], references: [id], onDelete: Cascade)
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([perfumeId, tagId])
+  @@index([perfumeId])
+  @@index([tagId])
+  @@map("perfume_tags")
+}
+
+// 购买链接表
+model AffiliateLink {
+  id          String   @id @default(cuid())
+  perfumeId   String
+  platform    String   // "taobao" | "tmall" | "jd" | "amazon" | "other"
+  url         String   @db.Text
+  price       Float?
+  currency    String   @default("CNY")
+  region      String?  // "CN" | "US" | "EU" | "JP"
+  isAffiliate Boolean  @default(false) // 是否分佣链接
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  perfume     Perfume  @relation(fields: [perfumeId], references: [id], onDelete: Cascade)
+
+  @@index([perfumeId])
+  @@index([platform])
+  @@index([isActive])
+  @@map("affiliate_links")
+}
+
+// 用户表
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  displayName  String?
+  role         String   @default("USER") // "USER" | "ADMIN"
+  status       String   @default("ACTIVE") // "ACTIVE" | "DISABLED"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  authSessions  AuthSession[]
+  sessions      Session[]
+  conversations Conversation[]
+  events        Event[]
+  feedbacks     Feedback[]
+
+  @@index([email])
+  @@index([role])
+  @@index([status])
+  @@map("users")
+}
+
+// 用户认证会话表（区别于匿名 Session）
+model AuthSession {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique // 存储在 httpOnly cookie 中
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("auth_sessions")
+}
+
+// 匿名会话表
+model Session {
+  id           String   @id @default(cuid())
+  anonymousId  String   @unique // 存储在cookie中
+  userId       String?  // 可选：登录后绑定到用户
+  userAgent    String?
+  ipAddress    String?
+  createdAt    DateTime @default(now())
+  lastActiveAt DateTime @updatedAt
+
+  // Relations
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  conversations Conversation[]
+
+  @@index([anonymousId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("sessions")
+}
+
+// 对话表
+model Conversation {
+  id             String   @id @default(cuid())
+  sessionId      String
+  userId         String?  // 可选：登录用户的ID
+  messages       Json     // 对话消息数组 [{role: "user"|"assistant", content: string}]
+  summaryProfile Json     // 用户偏好画像 {season, scene, sweetness, etc.}
+  status         String   @default("active") // "active" | "completed" | "abandoned"
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  session        Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  recommendations Recommendation[]
+
+  @@index([sessionId])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("conversations")
+}
+
+// 推荐表
+model Recommendation {
+  id             String   @id @default(cuid())
+  conversationId String
+  rationaleJSON  Json     // 推荐理由JSON（包含GPT生成的内容和依据）
+  createdAt      DateTime @default(now())
+
+  // Relations
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  perfumes       RecommendationPerfume[]
+
+  @@index([conversationId])
+  @@map("recommendations")
+}
+
+// 推荐-香水关联表（支持多个推荐项）
+model RecommendationPerfume {
+  id              String   @id @default(cuid())
+  recommendationId String
+  perfumeId       String
+  rank            Int      // 排名 1-N
+  similarityScore Float?   // 相似度分数 0-1
+  rationale       String?  @db.Text // 该香水的推荐理由
+  createdAt       DateTime @default(now())
+
+  // Relations
+  recommendation  Recommendation @relation(fields: [recommendationId], references: [id], onDelete: Cascade)
+  perfume         Perfume        @relation(fields: [perfumeId], references: [id], onDelete: Cascade)
+
+  @@unique([recommendationId, perfumeId])
+  @@index([recommendationId])
+  @@index([perfumeId])
+  @@map("recommendation_perfumes")
+}
+
+// 反馈表
+model Feedback {
+  id             String   @id @default(cuid())
+  conversationId String?
+  perfumeId      String
+  userId         String?  // 可选：登录用户的ID
+  like           Boolean? // true=喜欢, false=不喜欢, null=未明确
+  reasons        String[] // ["sweet", "powdery", "soapy", "medicinal", "smoky", "animalic"]
+  text           String?  @db.Text
+  sessionId      String?  // 可选：关联到session
+  createdAt      DateTime @default(now())
+
+  // Relations
+  perfume        Perfume  @relation(fields: [perfumeId], references: [id], onDelete: Cascade)
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([conversationId])
+  @@index([perfumeId])
+  @@index([userId])
+  @@index([sessionId])
+  @@index([like])
+  @@map("feedbacks")
+}
+
+// 事件埋点表
+model Event {
+  id        String   @id @default(cuid())
+  type      String   // "conversation_start" | "questionnaire_complete" | "recommendation_view" | "affiliate_click" | "feedback_submit" | "favorite_add"
+  payload   Json     // 事件载荷
+  sessionId String?
+  userId    String?  // 可选：登录用户的ID
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([type])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("events")
+}
+
+// 相似香水关联表
+model SimilarPerfume {
+  id              String   @id @default(cuid())
+  perfumeId       String   // 主香水
+  similarPerfumeId String // 相似香水
+  similarityScore Float    @default(0.0) // 相似度分数
+  createdAt       DateTime @default(now())
+
+  // Relations
+  perfume         Perfume  @relation("PerfumeSimilar", fields: [perfumeId], references: [id], onDelete: Cascade)
+  similarPerfume  Perfume  @relation("SimilarPerfume", fields: [similarPerfumeId], references: [id], onDelete: Cascade)
+
+  @@unique([perfumeId, similarPerfumeId])
+  @@index([perfumeId])
+  @@index([similarPerfumeId])
+  @@map("similar_perfumes")
+}
+
+// 香水图片候选表
+model PerfumeImageCandidate {
+  id            String   @id @default(cuid())
+  perfumeId     String
+  imageUrl      String   @db.Text
+  source        String   // "WIKIMEDIA" | "OPENVERSE"
+  license       String?  // 许可证信息
+  creator       String?  // 创作者
+  sourcePageUrl String?  @db.Text // 来源页面URL
+  confidence    Float    @default(0.5) // 0.0-1.0
+  status        String   @default("PENDING") // "PENDING" | "APPROVED" | "REJECTED"
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  perfume       Perfume  @relation(fields: [perfumeId], references: [id], onDelete: Cascade)
+
+  @@unique([perfumeId, imageUrl])
+  @@index([perfumeId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("perfume_image_candidates")
+}

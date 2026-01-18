@@ -1,101 +1,93 @@
-import Image from "next/image";
+import Link from "next/link";
+import { ScentButton } from "@/components/ui/scent-button";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="flex flex-col w-full">
+      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-gradient-to-b from-white to-black">
+        <div
+          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: "url('/background.jpg')",
+          }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/40 z-0"></div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-12 text-white">
+          <div className="md:col-span-8 md:col-start-1 fade-in-up">
+            <h2 className="text-xs font-bold tracking-[0.2em] uppercase mb-6 text-white/80">
+              Modern Olfactory Intelligence
+            </h2>
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-medium tracking-tight leading-none mb-10">
+              Scent <br /> Architecture
+            </h1>
+            <p className="text-sm md:text-base font-light tracking-wide max-w-md text-white/80 leading-relaxed mb-12">
+              We decode the chemistry of your memories to architect your perfect
+              fragrance profile. A data-driven approach to luxury perfumery.
+            </p>
+            <div className="flex gap-4">
+              <Link href="/consultation">
+                <ScentButton
+                  size="lg"
+                  className="bg-white text-black border-white hover:bg-transparent hover:text-white min-w-[180px]"
+                >
+                  Start Analysis
+                </ScentButton>
+              </Link>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </section>
+
+      <section className="py-32 bg-white">
+        <div className="max-w-[1400px] mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-gray-100 border border-gray-100">
+            {[
+              {
+                num: "01",
+                title: "Profiling",
+                desc: "Deep learning algorithms analyze your stylistic and emotional inputs.",
+              },
+              {
+                num: "02",
+                title: "Composition",
+                desc: "Mapping accords to chemical preferences and molecular volatility.",
+              },
+              {
+                num: "03",
+                title: "Selection",
+                desc: "Curating from a database of contemporary and heritage masterpieces.",
+              },
+            ].map((item) => (
+              <div
+                key={item.num}
+                className="bg-white p-12 md:p-16 flex flex-col h-full hover:bg-gray-50 transition-colors duration-500"
+              >
+                <span className="text-xs font-bold text-gray-300 mb-12">
+                  {item.num}
+                </span>
+                <h3 className="text-2xl font-medium mb-6 tracking-tight">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-gray-500 leading-relaxed mt-auto">
+                  {item.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-32 bg-black text-white border-t border-gray-900">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <p className="text-2xl md:text-4xl font-light leading-tight mb-10">
+            "Scent is the most intense form of memory."
+          </p>
+          <p className="text-[10px] uppercase tracking-widest text-gray-500">
+            Jean-Paul Guerlain
+          </p>
+        </div>
+      </section>
     </div>
   );
 }
