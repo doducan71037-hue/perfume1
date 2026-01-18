@@ -231,7 +231,7 @@ export async function generateReport(
 /**
  * 构建报告生成的prompt
  */
-function buildReportPrompt(userProfile: UserProfile, perfumeDetails: any[]): string {
+function buildReportPrompt(userProfile: UserProfile, perfumeDetails: unknown[]): string {
   // 优化：只发送前8个香水，减少prompt长度
   const limitedPerfumes = perfumeDetails.slice(0, 8);
   
@@ -273,7 +273,7 @@ ${JSON.stringify(limitedPerfumes, null, 2)}
 /**
  * 验证并丰富报告内容
  */
-function validateAndEnrichReport(report: GeneratedReport, perfumes: any[]): GeneratedReport {
+function validateAndEnrichReport(report: GeneratedReport, perfumes: Array<{ id: string }>): GeneratedReport {
   // 确保每个推荐都包含必需字段
   report.topRecommendations = report.topRecommendations.map((rec) => {
     const perfume = perfumes.find((p) => p.id === rec.perfumeId);
@@ -324,16 +324,16 @@ export async function generateQuickReport(
       whatItSmellsLike: p.description || "请查看详情了解这款香水的香调特征",
       whatItDoesNotSmellLike: "需要进一步了解",
       notesBreakdown: {
-        top: p.notes.filter((n: any) => n.position === "top").map((n: any) => n.note.name),
-        middle: p.notes.filter((n: any) => n.position === "middle").map((n: any) => n.note.name),
-        base: p.notes.filter((n: any) => n.position === "base").map((n: any) => n.note.name),
+        top: p.notes.filter((n) => n.position === "top").map((n) => n.note.name),
+        middle: p.notes.filter((n) => n.position === "middle").map((n) => n.note.name),
+        base: p.notes.filter((n) => n.position === "base").map((n) => n.note.name),
       },
-      accords: p.accords.map((a: any) => a.accord.name),
+      accords: p.accords.map((a) => a.accord.name),
       potentialIssues: "因人而异，建议试用后再决定",
       suitableScenes: userProfile.scene ? `适合${userProfile.scene}场景` : "日常使用",
       uncertaintyHints: "注意：气味主观、皮肤化学差异、仅供参考。",
       rationale: {
-        sources: p.notes.map((n: any) => n.note.name).slice(0, 3),
+        sources: p.notes.map((n) => n.note.name).slice(0, 3),
       },
     })),
     alternatives: alternatives.map((p) => ({
@@ -343,16 +343,16 @@ export async function generateQuickReport(
       whatItSmellsLike: p.description || "请查看详情",
       whatItDoesNotSmellLike: "需要进一步了解",
       notesBreakdown: {
-        top: p.notes.filter((n: any) => n.position === "top").map((n: any) => n.note.name),
-        middle: p.notes.filter((n: any) => n.position === "middle").map((n: any) => n.note.name),
-        base: p.notes.filter((n: any) => n.position === "base").map((n: any) => n.note.name),
+        top: p.notes.filter((n) => n.position === "top").map((n) => n.note.name),
+        middle: p.notes.filter((n) => n.position === "middle").map((n) => n.note.name),
+        base: p.notes.filter((n) => n.position === "base").map((n) => n.note.name),
       },
-      accords: p.accords.map((a: any) => a.accord.name),
+      accords: p.accords.map((a) => a.accord.name),
       potentialIssues: "因人而异",
       suitableScenes: "日常使用",
       uncertaintyHints: "注意：气味主观、皮肤化学差异、仅供参考。",
       rationale: {
-        sources: p.notes.map((n: any) => n.note.name).slice(0, 3),
+        sources: p.notes.map((n) => n.note.name).slice(0, 3),
       },
     })),
     summary: textSummary,
@@ -362,7 +362,14 @@ export async function generateQuickReport(
 /**
  * 降级报告生成（如果GPT失败）
  */
-function generateFallbackReport(perfumes: any[], textSummary?: string): GeneratedReport {
+function generateFallbackReport(perfumes: Array<{
+  id: string;
+  name: string;
+  brand: string;
+  description: string | null;
+  notes: Array<{ position: string; note: { name: string } }>;
+  accords: Array<{ accord: { name: string } }>;
+}>, textSummary?: string): GeneratedReport {
   const top3 = perfumes.slice(0, 3);
   const alternatives = perfumes.slice(3, 8);
 
@@ -375,16 +382,16 @@ function generateFallbackReport(perfumes: any[], textSummary?: string): Generate
       whatItSmellsLike: p.description || "请查看详情",
       whatItDoesNotSmellLike: "需要进一步了解",
       notesBreakdown: {
-        top: p.notes.filter((n: any) => n.position === "top").map((n: any) => n.note.name),
-        middle: p.notes.filter((n: any) => n.position === "middle").map((n: any) => n.note.name),
-        base: p.notes.filter((n: any) => n.position === "base").map((n: any) => n.note.name),
+        top: p.notes.filter((n) => n.position === "top").map((n) => n.note.name),
+        middle: p.notes.filter((n) => n.position === "middle").map((n) => n.note.name),
+        base: p.notes.filter((n) => n.position === "base").map((n) => n.note.name),
       },
-      accords: p.accords.map((a: any) => a.accord.name),
+      accords: p.accords.map((a) => a.accord.name),
       potentialIssues: "因人而异，请试用后再决定",
       suitableScenes: "日常使用",
       uncertaintyHints: "注意：气味主观、皮肤化学差异、仅供参考。",
       rationale: {
-        sources: p.notes.map((n: any) => n.note.name).slice(0, 3),
+        sources: p.notes.map((n) => n.note.name).slice(0, 3),
       },
     })),
     alternatives: alternatives.map((p) => ({
@@ -394,16 +401,16 @@ function generateFallbackReport(perfumes: any[], textSummary?: string): Generate
       whatItSmellsLike: p.description || "请查看详情",
       whatItDoesNotSmellLike: "需要进一步了解",
       notesBreakdown: {
-        top: p.notes.filter((n: any) => n.position === "top").map((n: any) => n.note.name),
-        middle: p.notes.filter((n: any) => n.position === "middle").map((n: any) => n.note.name),
-        base: p.notes.filter((n: any) => n.position === "base").map((n: any) => n.note.name),
+        top: p.notes.filter((n) => n.position === "top").map((n) => n.note.name),
+        middle: p.notes.filter((n) => n.position === "middle").map((n) => n.note.name),
+        base: p.notes.filter((n) => n.position === "base").map((n) => n.note.name),
       },
-      accords: p.accords.map((a: any) => a.accord.name),
+      accords: p.accords.map((a) => a.accord.name),
       potentialIssues: "因人而异",
       suitableScenes: "日常使用",
       uncertaintyHints: "注意：气味主观、皮肤化学差异、仅供参考。",
       rationale: {
-        sources: p.notes.map((n: any) => n.note.name).slice(0, 3),
+        sources: p.notes.map((n) => n.note.name).slice(0, 3),
       },
     })),
     summary: textSummary || `基于您的需求，我们为您推荐了${top3.length}支香水和${alternatives.length}个备选。每支香水都有其独特的香调特征，建议试用后再做决定。`,
