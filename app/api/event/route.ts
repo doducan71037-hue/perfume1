@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     await prisma.event.create({
       data: {
         type,
-        payload: payload || {},
+        payload: JSON.parse(JSON.stringify(payload || {})),
         sessionId,
       },
     });
