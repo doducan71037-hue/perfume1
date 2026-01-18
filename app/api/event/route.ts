@@ -13,7 +13,7 @@ const eventSchema = z.object({
     "feedback_submit",
     "favorite_add",
   ]),
-  payload: z.record(z.any()).optional(),
+  payload: z.record(z.string(), z.unknown()).optional(),
 });
 
 export async function POST(request: NextRequest) {
