@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
         where: { id: conversationId },
         data: {
           messages,
-          summaryProfile: profile,
+          summaryProfile: JSON.parse(JSON.stringify(profile)),
           status: "completed",
         },
       });
