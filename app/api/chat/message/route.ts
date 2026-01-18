@@ -191,7 +191,7 @@ async function generateDetailedReportAsync(
     await prisma.recommendation.update({
       where: { id: recommendationId },
       data: {
-        rationaleJSON: detailedReport,
+        rationaleJSON: JSON.parse(JSON.stringify(detailedReport)),
       },
     });
 
