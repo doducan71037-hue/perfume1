@@ -3,6 +3,8 @@ import { requireAdmin } from "@/lib/auth/require-admin";
 import { prisma } from "@/lib/db";
 import { handleError } from "@/lib/errors/handler";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const { error } = await requireAdmin();

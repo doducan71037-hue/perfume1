@@ -2,6 +2,42 @@ import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "@/lib/errors/handler";
 import { prisma } from "@/lib/db";
 
+type RelatedNote = {
+  position: string;
+  weight: number;
+  note: { id: string; name: string; nameCn: string | null };
+};
+
+type RelatedAccord = {
+  accord: { id: string; name: string; nameCn: string | null };
+};
+
+type RelatedTag = {
+  tag: { name: string };
+};
+
+type RelatedAffiliateLink = {
+  id: string;
+  platform: string;
+  url: string;
+  price: number | null;
+  isAffiliate: boolean;
+};
+
+type RelatedData = [RelatedNote[], RelatedAccord[], RelatedTag[], RelatedAffiliateLink[]];
+
+type SimilarPerfumeRow = {
+  similarityScore: number;
+  similarPerfume: { id: string; brand: string; name: string };
+};
+
+type FeedbackSummary = {
+  likeCount: number;
+  dislikeCount: number;
+  totalCount: number;
+  reasonCounts: Record<string, number>;
+};
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -45,7 +81,7 @@ export async function GET(
 
     // 2. 并行获取关联数据（使用超时，确保快速响应）
     // 设置500ms超时，如果超时就返回空数组，不阻塞主响应
-    const getRelatedData = async () => {
+    const getRelatedData = async (): Promise<RelatedData> => {
       try {
         const timeoutPromise = new Promise((_, reject) => {
           setTimeout(() => reject(new Error("Timeout")), 500); // 500ms超时
@@ -94,7 +130,7 @@ export async function GET(
           }),
         ]);
 
-        return await Promise.race([dataPromise, timeoutPromise]) as [unknown[], unknown[], unknown[], unknown[]];
+        return (await Promise.race([dataPromise, timeoutPromise])) as RelatedData;
       } catch {
         // 超时或错误时返回空数组，不阻塞主响应
         return [[], [], [], []];
@@ -105,7 +141,7 @@ export async function GET(
 
     // 3. 获取相似香水和反馈（使用超时，确保不阻塞主响应）
     // 设置500ms超时，如果超时就返回空数据
-    const getSecondaryData = async () => {
+    const getSecondaryData = async (): Promise<[SimilarPerfumeRow[], FeedbackSummary]> => {
       try {
         const timeoutPromise = new Promise((_, reject) => {
           setTimeout(() => reject(new Error("Timeout")), 500);
@@ -166,7 +202,7 @@ export async function GET(
           }),
         ]);
 
-        return await Promise.race([dataPromise, timeoutPromise]) as [unknown[], Record<string, unknown>];
+        return (await Promise.race([dataPromise, timeoutPromise])) as [SimilarPerfumeRow[], FeedbackSummary];
       } catch {
         // 超时或错误时返回空数据，不阻塞主响应
         return [[], { likeCount: 0, dislikeCount: 0, totalCount: 0, reasonCounts: {} }];

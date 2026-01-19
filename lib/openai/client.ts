@@ -3,13 +3,30 @@ type ChatMessage = {
   content: string;
 };
 
+type GeminiPayload = {
+  contents: Array<{
+    role: "model" | "user";
+    parts: Array<{ text: string }>;
+  }>;
+  systemInstruction?: {
+    parts: Array<{ text: string }>;
+  };
+  generationConfig?: {
+    temperature: number;
+    maxOutputTokens: number;
+    thinkingConfig?: {
+      thinkingBudget: number;
+    };
+  };
+};
+
 function buildGeminiPayload(messages: ChatMessage[], temperature: number, maxTokens: number, isProxy: boolean) {
   const systemInstruction = messages
     .filter((message) => message.role === "system")
     .map((message) => message.content)
     .join("\n");
 
-  const contents = messages
+  const contents: GeminiPayload["contents"] = messages
     .filter((message) => message.role !== "system")
     .map((message) => ({
       role: message.role === "assistant" ? "model" : "user",
@@ -18,7 +35,7 @@ function buildGeminiPayload(messages: ChatMessage[], temperature: number, maxTok
 
   // 关键发现：代理 API 在收到 generationConfig 时会自动添加无效的 thinking_budget
   // 解决方案：对于代理 API，完全不发送 generationConfig，让 API 使用默认值
-  const payload: Record<string, unknown> = {
+  const payload: GeminiPayload = {
     contents,
   };
 

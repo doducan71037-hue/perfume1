@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "@/lib/errors/handler";
 import { prisma } from "@/lib/db";
 
+type ReportPerfume = {
+  perfumeId?: string;
+  [key: string]: unknown;
+};
+
+type ReportPayload = {
+  topRecommendations?: ReportPerfume[];
+  alternatives?: ReportPerfume[];
+  [key: string]: unknown;
+};
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ conversationId: string }> }
@@ -36,7 +47,7 @@ export async function GET(
     }
 
     // 返回报告数据
-    const report = recommendation.rationaleJSON as Record<string, unknown>;
+    const report = recommendation.rationaleJSON as ReportPayload;
     
     // 构建 perfumeId -> imageUrl 映射，用于前端显示
     const perfumeImageMap = recommendation.perfumes.reduce(
@@ -49,15 +60,15 @@ export async function GET(
 
     // 将 imageUrl 直接添加到 report 的每个香水对象中，确保图片与产品一致
     if (report.topRecommendations && Array.isArray(report.topRecommendations)) {
-      report.topRecommendations = (report.topRecommendations as Array<Record<string, unknown>>).map((perfume) => ({
+      report.topRecommendations = report.topRecommendations.map((perfume) => ({
         ...perfume,
-        imageUrl: perfumeImageMap[perfume.perfumeId] || null,
+        imageUrl: perfume.perfumeId ? perfumeImageMap[perfume.perfumeId] || null : null,
       }));
     }
     if (report.alternatives && Array.isArray(report.alternatives)) {
-      report.alternatives = (report.alternatives as Array<Record<string, unknown>>).map((perfume) => ({
+      report.alternatives = report.alternatives.map((perfume) => ({
         ...perfume,
-        imageUrl: perfumeImageMap[perfume.perfumeId] || null,
+        imageUrl: perfume.perfumeId ? perfumeImageMap[perfume.perfumeId] || null : null,
       }));
     }
 

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyAdmin } from "@/lib/auth/admin-auth";
 
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/admin/perfumes
  * 获取香水列表（支持搜索和分页）

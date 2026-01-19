@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "@/lib/errors/handler";
 import { prisma } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 /**
  * 获取热门香水（用于搜索页面的默认展示）
  */

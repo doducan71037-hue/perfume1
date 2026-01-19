@@ -136,7 +136,7 @@ export function isQuestionnaireComplete(
 ): boolean {
   const hasEnoughInfo =
     messages.length >= 4 && // 至少3轮问答 + 初始消息
-    (profile.naturalLanguage || profile.scene || profile.season);
+    Boolean(profile.naturalLanguage || profile.scene || profile.season);
 
   return hasEnoughInfo;
 }

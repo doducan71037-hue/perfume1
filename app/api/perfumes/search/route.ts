@@ -4,6 +4,8 @@ import { handleError } from "@/lib/errors/handler";
 import { prisma } from "@/lib/db";
 import { normalizeSearchName } from "@/lib/normalize";
 
+export const dynamic = "force-dynamic";
+
 const searchSchema = z.object({
   q: z.string().optional(),
 });

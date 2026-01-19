@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyAdmin } from "@/lib/auth/admin-auth";
 
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/admin/images
  * 获取待审核的图片候选列表
