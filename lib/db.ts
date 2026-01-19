@@ -16,10 +16,10 @@ if (!url.searchParams.has('sslmode')) {
 }
 
 // 配置 Pool，强制使用 IPv4 并添加连接选项
-const pool = new Pool({
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const poolConfig: Record<string, unknown> = {
   connectionString: url.toString(),
   // 强制使用 IPv4，避免 IPv6 连接问题
-  // @ts-ignore - pg 库支持此选项但类型定义可能不完整
   family: 4,
   // 连接超时设置
   connectionTimeoutMillis: 10000,
@@ -27,11 +27,15 @@ const pool = new Pool({
   max: 10,
   // 空闲连接超时
   idleTimeoutMillis: 30000,
-  // SSL 配置（对于 Supabase 等云服务）
+  // SSL 配置（对于 Supabase 等云服务，接受自签名证书）
   ssl: url.searchParams.get('sslmode') === 'require' || url.searchParams.get('sslmode') === 'prefer' 
-    ? { rejectUnauthorized: false } 
+    ? { 
+        rejectUnauthorized: false,
+      } 
     : false,
-});
+};
+
+const pool = new Pool(poolConfig as ConstructorParameters<typeof Pool>[0]);
 
 const adapter = new PrismaPg(pool);
 
