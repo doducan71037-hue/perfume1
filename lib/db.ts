@@ -10,9 +10,14 @@ const connectionString = process.env.DATABASE_URL!;
 
 // 解析连接字符串以添加 SSL 配置
 const url = new URL(connectionString);
-// 如果连接字符串中没有 sslmode，添加 prefer（更宽松的 SSL 模式）
-if (!url.searchParams.has('sslmode')) {
-  url.searchParams.set('sslmode', 'prefer');
+const sslMode = url.searchParams.get("sslmode") || "prefer";
+const allowSelfSigned = sslMode === "require" || sslMode === "prefer";
+if (!url.searchParams.has("sslmode")) {
+  url.searchParams.set("sslmode", sslMode);
+}
+// 避免 pg 同时读取 sslmode + ssl 配置导致冲突
+if (allowSelfSigned) {
+  url.searchParams.delete("sslmode");
 }
 
 // 配置 Pool，强制使用 IPv4 并添加连接选项
@@ -28,10 +33,10 @@ const poolConfig: Record<string, unknown> = {
   // 空闲连接超时
   idleTimeoutMillis: 30000,
   // SSL 配置（对于 Supabase 等云服务，接受自签名证书）
-  ssl: url.searchParams.get('sslmode') === 'require' || url.searchParams.get('sslmode') === 'prefer' 
-    ? { 
+  ssl: allowSelfSigned
+    ? {
         rejectUnauthorized: false,
-      } 
+      }
     : false,
 };
 

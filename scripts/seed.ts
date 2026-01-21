@@ -11,7 +11,20 @@ import { generateEmbeddingsBatch } from "../lib/embeddings";
 import { normalizeSearchName } from "../lib/normalize";
 
 const connectionString = process.env.DATABASE_URL!;
-const pool = new Pool({ connectionString });
+const url = new URL(connectionString);
+const sslMode = url.searchParams.get("sslmode") || "prefer";
+const allowSelfSigned = sslMode === "require" || sslMode === "prefer";
+if (!url.searchParams.has("sslmode")) {
+  url.searchParams.set("sslmode", sslMode);
+}
+if (allowSelfSigned) {
+  url.searchParams.delete("sslmode");
+}
+const poolConfig: Record<string, unknown> = {
+  connectionString: url.toString(),
+  ssl: allowSelfSigned ? { rejectUnauthorized: false } : false,
+};
+const pool = new Pool(poolConfig as ConstructorParameters<typeof Pool>[0]);
 const adapter = new PrismaPg(pool);
 
 const prisma = new PrismaClient({ adapter });
